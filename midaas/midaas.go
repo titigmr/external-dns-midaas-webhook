@@ -79,7 +79,8 @@ func NewMiDaasProvider(WsUrl string, tsig []TSIGCredentials, domainFilter endpoi
 func GetAvailableZones(dnsSuffix string, domainFilter *endpoint.DomainFilter, tsig *[]TSIGCredentials) *endpoint.DomainFilter {
 	filters := &domainFilter.Filters
 	for _, config := range *tsig {
-		zone := fmt.Sprintf("%v.%v", strings.Split(config.Keyname, ".")[1], dnsSuffix)
+		ss := strings.Split(config.Keyname, ".")
+		zone := fmt.Sprintf("%v.%v", ss[len(ss)-1], dnsSuffix)
 		log.WithField("zone", zone).Info("Successfully parsed zones")
 		*filters = append(*filters, zone)
 	}
