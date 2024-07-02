@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
+	"path"
 	"time"
 
 	log "github.com/sirupsen/logrus"
 
+	"github.com/Showmax/env"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/titigmr/external-dns-midaas-wehbook/api"
 	"github.com/titigmr/external-dns-midaas-wehbook/midaas"
@@ -28,25 +30,38 @@ type Config struct {
 	}
 }
 
+type TSIGConfig struct {
+	Map map[string]string `env:"ZONE_"`
+}
+
 func main() {
 
 	log.SetLevel(log.DebugLevel)
 	log.SetFormatter(&log.TextFormatter{
 		FullTimestamp: true,
-		DisableColors: false,
 	})
 
 	var cfg Config
-
 	err := envconfig.Process("", &cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// parse zone config
 	domainFilters := endpoint.DomainFilter{}
-	tsigs := make([]midaas.TSIGCredentials, 1)
-	tsigs[1] = midaas.TSIGCredentials{Keyname: "ddns-key.d301", Keyvalue: "jdzudhzuZD=="}
-	p, err := midaas.NewMiDaasProvider(cfg.Provider.WsUrl, tsigs, domainFilters, cfg.Provider.ZoneSuffix, cfg.Provider.SkipTlsVerify)
+	var tsigCfg TSIGConfig
+	errTsig := env.Load(&tsigCfg, "TSIG_")
+	if err != nil {
+		log.Fatal(errTsig)
+	}
+
+	var tsigs []midaas.TSIGCredentials
+	for key, value := range tsigCfg.Map {
+		tsigs = append(tsigs, midaas.TSIGCredentials{Keyname: fmt.Sprintf("%v%v", "ddns-key.", key), Keyvalue: value})
+	}
+
+	// create provider
+	p, err := midaas.NewMiDaasProvider(path.Dir(cfg.Provider.WsUrl), tsigs, domainFilters, cfg.Provider.ZoneSuffix, cfg.Provider.SkipTlsVerify)
 
 	if err != nil {
 		log.Fatal(err)

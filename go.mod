@@ -3,6 +3,7 @@ module github.com/titigmr/external-dns-midaas-wehbook
 go 1.22.4
 
 require (
+	github.com/Showmax/env v1.0.3
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/sirupsen/logrus v1.9.3
 	sigs.k8s.io/external-dns v0.14.2

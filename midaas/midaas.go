@@ -62,7 +62,7 @@ type midaasProvider struct {
 
 func NewMiDaasProvider(WsUrl string, tsig []TSIGCredentials, domainFilter endpoint.DomainFilter, dnsSuffix string, skipTlsVerify bool) (provider.Provider, error) {
 	if len(tsig) == 0 {
-		return nil, fmt.Errorf("no midaas tsig provided")
+		return nil, fmt.Errorf("no midaas tsig provided, use TSIG_ZONE_<Zone>=<Keyvalue> env vars ")
 	}
 
 	UpdateHttpClient(skipTlsVerify)
@@ -302,6 +302,6 @@ func (p *midaasProvider) GetDomainFilter() endpoint.DomainFilter {
 	return p.domainFilter
 }
 
-func (p *midaasProvider) AdjustEndpoints(endpoints []*endpoint.Endpoint) []*endpoint.Endpoint {
-	return endpoints
+func (p midaasProvider) AdjustEndpoints(endpoints []*endpoint.Endpoint) ([]*endpoint.Endpoint, error) {
+	return endpoints, nil
 }
