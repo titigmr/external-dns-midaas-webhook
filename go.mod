@@ -1,4 +1,4 @@
-module github.com/titigmr/external-dns-midaas-wehbook
+module github.com/titigmr/external-dns-midaas-webhook
 
 go 1.22.4
 
