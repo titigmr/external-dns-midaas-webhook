@@ -67,7 +67,7 @@ func main() {
 	}
 
 	// create provider
-	p, err := midaas.NewMiDaasProvider(strings.TrimRight(cfg.Provider.WsUrl,"/"), tsigs, domainFilters, cfg.Provider.ZoneSuffix, cfg.Provider.SkipTlsVerify)
+	p, err := midaas.NewMiDaasProvider(strings.TrimRight(cfg.Provider.WsUrl, "/"), tsigs, domainFilters, cfg.Provider.ZoneSuffix, cfg.Provider.SkipTlsVerify)
 
 	if err != nil {
 		log.Fatal(err)
