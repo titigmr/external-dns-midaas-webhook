@@ -62,11 +62,14 @@ jobs:
       short-sha: ${{ steps.infos.outputs.SHORT_SHA }}
       platforms-json: ${{ steps.infos.outputs.PLATFORMS_JSON }}
     steps:
+      - name: Checks-out repository
+        uses: actions/checkout@v4
+
       - name: Get variables
         id: infos
         run: |
           echo "SHORT_SHA=sha-$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
-          echo "PLATFORMS_JSON=$(echo "$PLATFORMS"| jq -c 'split(",")')" >> $GITHUB_OUTPUT
+          echo "PLATFORMS_JSON=$(echo '"${{ inputs.PLATFORMS }}"' | jq -c 'split(",")')" >> $GITHUB_OUTPUT
 
   build-binaries:
     name: Build application binaries
@@ -75,7 +78,7 @@ jobs:
       - vars
     strategy:
       matrix:
-        platforms: ${{ needs.vars.outputs.platforms-json }}
+        platforms: ${{ fromJson(needs.vars.outputs.platforms-json) }}
     steps:
       - name: Checks-out repository
         uses: actions/checkout@v4
@@ -93,17 +96,20 @@ jobs:
 
       - name: Run build
         run: |
-          BUILD_OS=$(echo ${{ matrix.platforms }} | cut -d '/' -f 1)
-          BUILD_ARCH=$(echo ${{ matrix.platforms }} | cut -d '/' -f 2,3)
+          export BUILD_OS="$(echo ${{ matrix.platforms }} | cut -d '/' -f 1)"
+          export BUILD_ARCH="$(echo ${{ matrix.platforms }} | cut -d '/' -f 2,3)"
+
+          echo "BUILD_OS=$BUILD_OS" >> $GITHUB_ENV
+          echo "BUILD_ARCH=$BUILD_ARCH" >> $GITHUB_ENV
 
           CGO_ENABLED=0 GOOS=${BUILD_OS} GOARCH=${BUILD_ARCH} \
             go build -o ./binaries/external-dns-midaas-webhook_${BUILD_OS}-${BUILD_ARCH} .
 
-      - name: Upload test results
+      - name: Upload build results
         uses: actions/upload-artifact@v4
         with:
-          name: external-dns-midaas-webhook_${BUILD_OS}-${BUILD_ARCH}
-          path: ./binaries/external-dns-midaas-webhook_${BUILD_OS}-${BUILD_ARCH}
+          name: external-dns-midaas-webhook_${{ env.BUILD_OS }}-${{ env.BUILD_ARCH }}
+          path: ./binaries/external-dns-midaas-webhook_${{ env.BUILD_OS }}-${{ env.BUILD_ARCH }}
 
   build-docker:
     name: Build application image
