@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - "**"
+  workflow_dispatch:
+
+env:
+  REGISTRY: "ghcr.io"
+  NAMESPACE: "${{ github.repository }}"
+  PLATFORMS: linux/amd64,linux/arm64
+  GO_VERSION: 1.22.4
+
+jobs:
+  path-filter:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    outputs:
+      app: ${{ steps.filter.outputs.app }}
+    steps:
+      - name: Checks-out repository
+        uses: actions/checkout@v4
+
+      - name: Check updated files paths
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app:
+              - 'api/**'
+              - 'midaas/**'
+              - 'go.mod'
+              - 'go.sum'
+              - 'main.go'
+
+  expose-vars:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
+    outputs:
+      REGISTRY: ${{ env.REGISTRY }}
+      NAMESPACE: ${{ env.NAMESPACE }}
+      PLATFORMS: ${{ env.PLATFORMS }}
+      GO_VERSION: ${{ env.GO_VERSION }}
+    steps:
+      - name: Exposing env vars
+        run: echo "Exposing env vars"
+
+  test:
+    uses: ./.github/workflows/test.yml
+    if: ${{ needs.path-filter.outputs.app == 'true' }}
+    needs:
+      - path-filter
+      - expose-vars
+    permissions:
+      packages: write
+    with:
+      GO_VERSION: ${{ needs.expose-vars.outputs.GO_VERSION }}
+
+  build:
+    uses: ./.github/workflows/build.yml
+    if: ${{ needs.path-filter.outputs.app == 'true' }}
+    needs:
+      - path-filter
+      - expose-vars
+    permissions:
+      packages: write
+    with:
+      REGISTRY: ${{ needs.expose-vars.outputs.REGISTRY }}
+      NAMESPACE: ${{ needs.expose-vars.outputs.NAMESPACE }}
+      PLATFORMS: ${{ needs.expose-vars.outputs.PLATFORMS }}
+      TAG: pr-${{ github.event.pull_request.number || github.event.number }}
+
+  # Workaround for required status check in protection branches (see. https://github.com/orgs/community/discussions/13690)
+  all-jobs-passed:
+    name: Check jobs status
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    needs:
+      - path-filter
+      - expose-vars
+      - build
+    steps:
+      - name: Check status of all required jobs
+        run: |-
+          NEEDS_CONTEXT='${{ toJson(needs) }}'
+          JOB_IDS=$(echo "$NEEDS_CONTEXT" | jq -r 'keys[]')
+          for JOB_ID in $JOB_IDS; do
+            RESULT=$(echo "$NEEDS_CONTEXT" | jq -r ".[\"$JOB_ID\"].result")
+            echo "$JOB_ID job result: $RESULT"
+            if [[ $RESULT != "success" && $RESULT != "skipped" ]]; then
+              echo "***"
+              echo "Error: The $JOB_ID job did not pass."
+              exit 1
+            fi
+          done
+          echo "All jobs passed or were skipped."
