@@ -24,6 +24,9 @@ jobs:
 
   release:
     uses: ./.github/workflows/release.yml
+    permissions:
+      contents: write
+      pull-requests: write
 
   build:
     uses: ./.github/workflows/build.yml
