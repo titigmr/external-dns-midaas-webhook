@@ -6,6 +6,9 @@ on:
       release-created:
         description: "Has the releease been created"
         value: ${{ jobs.release.outputs.release-created }}
+      tag-name:
+        description: "Release tag name"
+        value: ${{ jobs.release.outputs.tag-name }}
       major-tag:
         description: "Major version tag"
         value: ${{ jobs.release.outputs.major-tag }}
@@ -22,6 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release-created: ${{ steps.release.outputs.release_created }}
+      tag-name: ${{ steps.release.outputs.tag_name }}
       major-tag: ${{ steps.release.outputs.major }}
       minor-tag: ${{ steps.release.outputs.minor }}
       patch-tag: ${{ steps.release.outputs.patch }}
@@ -29,7 +33,7 @@ jobs:
       - name: Checks-out repository
         uses: actions/checkout@v4
 
-      - name: Pre release new version
+      - name: Release new version
         uses: googleapis/release-please-action@v4
         id: release
         with:
