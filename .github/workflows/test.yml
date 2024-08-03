@@ -1,0 +1,41 @@
+name: Test
+
+on:
+  workflow_call:
+    inputs:
+      GO_VERSION:
+        required: true
+        type: string
+  workflow_dispatch:
+    inputs:
+      GO_VERSION:
+        description: Go version to use
+        required: true
+        type: string
+        default: 1.22.4
+
+jobs:
+  test:
+    name: Test application
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ inputs.GO_VERSION }}
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run vet command
+        run: go vet .
+
+      - name: Run test
+        run: go test -v -coverprofile ./cover.out . && go tool cover -html ./cover.out -o ./cover.html
+
+      - name: Upload test results
+        if: ${{ failure() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: ./cover.html

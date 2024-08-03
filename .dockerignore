@@ -1,0 +1,6 @@
+.github/
+ci/
+.release-please-manifest.json
+release-please-manifest.json
+README.md
+LICENSE

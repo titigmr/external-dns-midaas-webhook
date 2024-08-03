@@ -1,0 +1,69 @@
+name: Clean cache
+
+on:
+  pull_request:
+    types:
+      - closed
+  workflow_dispatch:
+    inputs:
+      PR_NUMBER:
+        description: ID number of the pull request assiocited with the cache
+        required: false
+        type: number
+      BRANCH_NAME:
+        description: Branch name assiocited with the cache
+        required: false
+        type: string
+
+jobs:
+  cleanup-cache:
+    name: Delete gituhb cache
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Clean cache for closed branch
+        run: |
+          gh extension install actions/gh-actions-cache
+
+          REPO=${{ github.repository }}
+          if [ -n "${{ inputs.BRANCH_NAME }}" ]; then
+            BRANCH="${{ inputs.BRANCH_NAME }}"
+          else
+            BRANCH="refs/pull/${{ github.event.pull_request.number || inputs.PR_NUMBER }}/merge"
+          fi
+
+          echo "Fetching list of cache key"
+          cacheKeysForPR=$(gh actions-cache list -R $REPO -B $BRANCH -L 100 | cut -f 1 )
+
+          ## Setting this to not fail the workflow while deleting cache keys. 
+          set +e
+          echo "Deleting caches..."
+          for cacheKey in $cacheKeysForPR; do
+            gh actions-cache delete $cacheKey -R $REPO -B $BRANCH --confirm
+          done
+          echo "Done"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cleanup-image:
+    name: Delete image from ghcr.io
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checks-out repository
+        uses: actions/checkout@v4
+
+      - name: Get repository owner and name
+        id: image-infos
+        run: |
+          echo "ORG_NAME=$(echo '${{ github.repository }}' | cut -d "/" -f 1)" >> $GITHUB_OUTPUT
+          echo "REPO_NAME=$(echo '${{ github.repository }}' | cut -d "/" -f 2)" >> $GITHUB_OUTPUT
+
+      - name: Delete external-dns-midaas-webhook image
+        run: |
+          ./ci/scripts/delete-image.sh \
+            -o "${{ steps.image-infos.outputs.ORG_NAME }}" \
+            -i "${{ steps.image-infos.outputs.REPO_NAME }}/external-dns-midaas-webhook" \
+            -t "pr-${{ github.event.pull_request.number || github.event.number }}" \
+            -g "${{ secrets.GITHUB_TOKEN }}"
