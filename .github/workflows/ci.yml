@@ -12,10 +12,10 @@ on:
   workflow_dispatch:
 
 env:
+  GO_VERSION: 1.22.4
   REGISTRY: "ghcr.io"
   NAMESPACE: "${{ github.repository }}"
   PLATFORMS: linux/amd64,linux/arm64
-  GO_VERSION: 1.22.4
 
 jobs:
   path-filter:
@@ -43,10 +43,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft }}
     outputs:
+      GO_VERSION: ${{ env.GO_VERSION }}
       REGISTRY: ${{ env.REGISTRY }}
       NAMESPACE: ${{ env.NAMESPACE }}
       PLATFORMS: ${{ env.PLATFORMS }}
-      GO_VERSION: ${{ env.GO_VERSION }}
     steps:
       - name: Exposing env vars
         run: echo "Exposing env vars"
@@ -58,7 +58,7 @@ jobs:
       - path-filter
       - expose-vars
     permissions:
-      packages: write
+      contents: write
     with:
       GO_VERSION: ${{ needs.expose-vars.outputs.GO_VERSION }}
 
@@ -70,7 +70,9 @@ jobs:
       - expose-vars
     permissions:
       packages: write
+      contents: write
     with:
+      GO_VERSION: ${{ needs.expose-vars.outputs.GO_VERSION }}
       REGISTRY: ${{ needs.expose-vars.outputs.REGISTRY }}
       NAMESPACE: ${{ needs.expose-vars.outputs.NAMESPACE }}
       PLATFORMS: ${{ needs.expose-vars.outputs.PLATFORMS }}

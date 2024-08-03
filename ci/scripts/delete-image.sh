@@ -75,19 +75,19 @@ fi
 IMAGE_NAME_URL_ENCODED="$(jq -rn --arg x ${IMAGE_NAME} '$x | @uri')"
 IMAGES=$(curl -s \
   -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-  "https://api.github.com/orgs/${ORG}/packages/container/${IMAGE_NAME_URL_ENCODED}/versions?per_page=100")
-MAIN_IMAGE_ID=$(echo "$IMAGES" | jq -r --arg t "$TAG" '.[] | select(.metadata.container.tags[] | contains($t)) | .id')
+  "https://api.github.com/users/${ORG}/packages/container/${IMAGE_NAME_URL_ENCODED}/versions?per_page=100")
+MAIN_IMAGE_ID=$(echo "$IMAGES" | jq -r --arg t "$TAG" '.[] | select(.labels["org.opencontainers.image.version"] == $t) | .id')
 
 # Delete subsequent images
 while read -r SHA; do
-  IMAGE_ID=$(echo "$IMAGES" | jq -r --arg s "$SHA" '.[] | select(.name==$s) | .id')
+  IMAGE_ID=$(echo "$IMAGES" | jq -r --arg s "$SHA" '.[] | select(.name == $s) | .id')
 
   printf "\n${red}[Delete ghcr image].${no_color} Deleting subsequent image '$ORG/$IMAGE_NAME@$SHA'\n"
 
   curl -s \
     -X DELETE \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    "https://api.github.com/orgs/${ORG}/packages/container/${IMAGE_NAME_URL_ENCODED}/versions/${IMAGE_ID}"
+    "https://api.github.com/user/${ORG}/packages/container/${IMAGE_NAME_URL_ENCODED}/versions/${IMAGE_ID}"
 done <<< "$(docker buildx imagetools inspect ghcr.io/${ORG}/${IMAGE_NAME}:${TAG} --raw | jq -r '.manifests[] | .digest')"
 
 # Delete main image
@@ -96,4 +96,4 @@ printf "\n${red}[Delete ghcr image].${no_color} Deleting image '$ORG/$IMAGE_NAME
 curl -s \
   -X DELETE \
   -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-  "https://api.github.com/orgs/${ORG}/packages/container/${IMAGE_NAME_URL_ENCODED}/versions/${MAIN_IMAGE_ID}"
+  "https://api.github.com/user/${ORG}/packages/container/${IMAGE_NAME_URL_ENCODED}/versions/${MAIN_IMAGE_ID}"

@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 
 env:
+  GO_VERSION: 1.22.4
   REGISTRY: "ghcr.io"
   NAMESPACE: "${{ github.repository }}"
   PLATFORMS: linux/amd64,linux/arm64
@@ -15,6 +16,7 @@ jobs:
   expose-vars:
     runs-on: ubuntu-latest
     outputs:
+      GO_VERSION: ${{ env.GO_VERSION }}
       REGISTRY: ${{ env.REGISTRY }}
       NAMESPACE: ${{ env.NAMESPACE }}
       PLATFORMS: ${{ env.PLATFORMS }}
@@ -36,7 +38,9 @@ jobs:
       - release
     permissions:
       packages: write
+      contents: write
     with:
+      GO_VERSION: ${{ needs.expose-vars.outputs.GO_VERSION }}
       REGISTRY: ${{ needs.expose-vars.outputs.REGISTRY }}
       NAMESPACE: ${{ needs.expose-vars.outputs.NAMESPACE }}
       PLATFORMS: ${{ needs.expose-vars.outputs.PLATFORMS }}
@@ -44,3 +48,25 @@ jobs:
       MAJOR_TAG: ${{ needs.release.outputs.major-tag }}
       MINOR_TAG: ${{ needs.release.outputs.minor-tag }}
       PATCH_TAG: ${{ needs.release.outputs.patch-tag }}
+
+  artifacts:
+    runs-on: ubuntu-latest
+    if: ${{ needs.release.outputs.release-created == 'true' }}
+    needs: 
+      - expose-vars
+      - release
+      - build
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          pattern: external-dns-midaas-webhook_*
+          path: ./binaries
+          merge-multiple: true
+
+      - name: Upload Release Artifact
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload ${{ needs.release.outputs.tag-name }} $(ls ./binaries)

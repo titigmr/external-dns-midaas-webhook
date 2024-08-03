@@ -14,6 +14,9 @@ on:
         type: string
         default: 1.22.4
 
+permissions:
+  contents: read
+  
 jobs:
   test:
     name: Test application
