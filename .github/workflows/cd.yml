@@ -69,4 +69,4 @@ jobs:
       - name: Upload Release Artifact
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ needs.release.outputs.tag-name }} $(ls ./binaries)
+        run: gh release upload ${{ needs.release.outputs.tag-name }} $(find ./binaries -type f)
