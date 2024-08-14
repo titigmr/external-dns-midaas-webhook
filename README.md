@@ -43,6 +43,21 @@ provider:
 helm install external-dns external-dns -f external-dns-midaas-values.yaml
 ```
 
+## Parameters references
+
+| Name                     | Description                                           | Default value                      |
+| ------------------------ | ----------------------------------------------------- | ---------------------------------- |
+| API_SERVER_PORT          | define the host where api listen, for all interfaces  | `"0.0.0.0"`                        |
+| API_SERVER_HOST          | define the port where api listen                      | `"8888"`                           |
+| API_READ_TIMEOUT         | timout until read                                     | `3s`                               |
+| API_WRITE_TIMEOUT        | timeout until write                                   | `3s`                               |
+| API_LOG_LEVEL            | log level among `DEBUG`,`INFO`,`TRACE`,`WARN`,`ERROR` | `INFO`                             |
+| PROVIDER_SKIP_TLS_VERIFY | enable tls verification                               | `false`                            |
+| PROVIDER_DNS_ZONE_SUFFIX | dns zone suffix                                       | `"dev.example.com"`                |
+| PROVIDER_WS_URL          | webservice url                                        | `"https://webservice.example.com"` |
+
+
+
 ## Local development
 
 🚧 Work in progress.
