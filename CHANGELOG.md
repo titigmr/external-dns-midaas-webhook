@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.1](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.1.0...v0.1.1) (2024-08-14)
+
+
+### Bug Fixes
+
+* :bug: typo in route ([0dc364d](https://github.com/titigmr/external-dns-midaas-webhook/commit/0dc364d2963903a752e9413fb60df378e43e8acc))
+
 ## [0.1.0](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.0.1...v0.1.0) (2024-08-03)
 
 
