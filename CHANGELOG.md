@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.3](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.1.2...v0.1.3) (2024-08-14)
+
+
+### Bug Fixes
+
+* :zap: add updateold changes ([f130b34](https://github.com/titigmr/external-dns-midaas-webhook/commit/f130b34205e8fb639c71f4c7d85384cb0278de53))
+
 ## [0.1.2](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.1.1...v0.1.2) (2024-08-14)
 
 
