@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.1.1...v0.1.2) (2024-08-14)
+
+
+### Bug Fixes
+
+* :sparkles: change default values and entrypoint ([dc81f29](https://github.com/titigmr/external-dns-midaas-webhook/commit/dc81f29bf296e36cef718b8d3027a0fe7abebd2d))
+
 ## [0.1.1](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.1.0...v0.1.1) (2024-08-14)
 
 
