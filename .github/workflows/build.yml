@@ -152,6 +152,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          target: prod
           provenance: false
           platforms: ${{ inputs.PLATFORMS }}
           tags: ${{ steps.meta.outputs.tags }}

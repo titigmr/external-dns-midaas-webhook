@@ -145,9 +145,10 @@ func (p *midaasProvider) ApplyRecord(action string, recordInfo *ZoneRecord) erro
 }
 
 func (p *midaasProvider) ApplyChanges(ctx context.Context, changes *plan.Changes) error {
-	combinedChanges := make([]*ChangeRecord, 0, len(changes.Create)+len(changes.UpdateNew)+len(changes.Delete))
+	combinedChanges := make([]*ChangeRecord, 0, len(changes.Create)+len(changes.UpdateNew)+len(changes.Delete)+len(changes.UpdateOld))
 
 	combinedChanges = append(combinedChanges, p.newChanges(dnsCreate, changes.Create)...)
+	combinedChanges = append(combinedChanges, p.newChanges(dnsDelete, changes.UpdateOld)...)
 	combinedChanges = append(combinedChanges, p.newChanges(dnsUpdate, changes.UpdateNew)...)
 	combinedChanges = append(combinedChanges, p.newChanges(dnsDelete, changes.Delete)...)
 

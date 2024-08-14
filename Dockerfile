@@ -1,3 +1,12 @@
+# Dev stage
+FROM --platform=${BUILDPLATFORM:-linux/amd64} docker.io/golang:1.22.4 AS dev
+RUN go install github.com/air-verse/air@latest
+WORKDIR /go/src/app
+COPY go.mod go.mod
+COPY go.sum go.sum
+RUN go mod tidy
+ENTRYPOINT ["air"]
+
 # Build stage
 FROM --platform=${BUILDPLATFORM:-linux/amd64} docker.io/golang:1.22.4 AS build
 
