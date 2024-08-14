@@ -16,8 +16,8 @@ import (
 
 type Config struct {
 	Server struct {
-		Port string `envconfig:"API_SERVER_PORT" default:"6666"`
-		Host string `envconfig:"API_SERVER_HOST" default:"127.0.0.1"`
+		Port string `envconfig:"API_SERVER_PORT" default:"8888"`
+		Host string `envconfig:"API_SERVER_HOST" default:"0.0.0.0"`
 	}
 	Options struct {
 		ReadTimeout  time.Duration `envconfig:"API_READ_TIMEOUT"   default:"3s"`

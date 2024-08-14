@@ -21,4 +21,4 @@ RUN CGO_ENABLED=${CGO_ENABLED} GOOS=${TARGETOS} GOARCH=${TARGETARCH} \
 FROM gcr.io/distroless/static-debian12:nonroot AS prod
 
 COPY --from=build /go/bin/app /
-CMD ["/app"]
+ENTRYPOINT ["/app"]

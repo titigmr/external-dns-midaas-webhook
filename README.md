@@ -17,9 +17,11 @@ helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 1. Create the helm values file `external-dns-midaas-values.yaml`:
 
 ```yaml
-# if midaas can delete records in dns zone
+# -- How DNS records are synchronized between sources and providers; available values are `sync` & `upsert-only`.
 policy: sync
-# midaas manage all records on zone
+# -- Specify the registry for storing ownership and labels.
+# Valid values are `txt`, `aws-sd`, `dynamodb` & `noop`.
+# If `noop` midaas manage all records on zone
 registry: noop
 # can restrict zone
 domainFilters: ["subzone.dev.example.com"]
@@ -27,10 +29,8 @@ provider:
   name: webhook
   webhook: 
     image: ghcr.io/titigmr/external-dns-midaas-webhook
-    tag: v1.0.0
+    tag: latest
   env:
-  - name: PROVIDER_SKIP_TLS_VERIFY
-    value: "true"
   - name: PROVIDER_DNS_ZONE_SUFFIX
     value: "dev.example.com"
   - name: PROVIDER_WS_URL
