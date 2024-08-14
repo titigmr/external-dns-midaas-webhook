@@ -41,7 +41,7 @@ func StartHTTPApi(provider provider.Provider, readTimeout, writeTimeout time.Dur
 	})
 
 	m := http.NewServeMux()
-	m.HandleFunc("/healtz", p.GetHealthz)
+	m.HandleFunc("/healthz", p.GetHealthz)
 	m.HandleFunc("/", p.NegotiateHandler)
 	m.HandleFunc("/records", p.RecordsHandler)
 	m.HandleFunc("/adjustendpoints", p.AdjustEndpointsHandler)
