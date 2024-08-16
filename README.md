@@ -28,8 +28,9 @@ domainFilters: ["subzone.d1.dev.example.com"]
 provider: 
   name: webhook
   webhook: 
-    image: ghcr.io/titigmr/external-dns-midaas-webhook
-    tag: latest
+    image: 
+      repository: ghcr.io/titigmr/external-dns-midaas-webhook
+      tag: latest
   env:
   - name: PROVIDER_DNS_ZONE_SUFFIX
     value: "dev.example.com"

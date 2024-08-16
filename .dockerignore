@@ -1,5 +1,6 @@
 .github/
 ci/
+kind/
 .release-please-manifest.json
 release-please-manifest.json
 README.md
