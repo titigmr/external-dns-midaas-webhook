@@ -1,0 +1,37 @@
+# -- How DNS records are synchronized between sources and providers; available values are `sync` & `upsert-only`.
+policy: sync
+# -- Specify the registry for storing ownership and labels.
+# Valid values are `txt`, `aws-sd`, `dynamodb` & `noop`.
+# If `noop` midaas manage all records on zone
+registry: txt
+# can restrict zone
+provider: 
+  name: webhook
+  webhook: 
+    image: 
+      repository: external-dns-midaas-webhook
+      tag: dev
+      pullPolicy: Never
+    env:
+    - name: TSIG_ZONE_foo
+      value: bar
+    - name: API_LOG_LEVEL
+      value: DEBUG
+    - name: PROVIDER_SKIP_TLS_VERIFY
+      value: "true"
+    extraVolumeMounts:
+    - name: dev-workspace
+      mountPath: /go/src/app
+  env:
+  - name: PROVIDER_DNS_ZONE_SUFFIX
+    value: "dev.example.com"
+  - name: PROVIDER_WS_URL
+    value: https://midaas.example.com/midaas/ws"
+  - name: TSIG_ZONE_foo
+    value: bar
+podSecurityContext:
+  runAsNonRoot: false
+extraVolumes:
+- name: dev-workspace
+  hostPath:
+    path: /app
