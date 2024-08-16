@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.1.3...v0.1.4) (2024-08-16)
+
+
+### Bug Fixes
+
+* :bug: txt management ([9d07575](https://github.com/titigmr/external-dns-midaas-webhook/commit/9d0757594789be99bec4e463089e3e0a29fa0d4c))
+
 ## [0.1.3](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.1.2...v0.1.3) (2024-08-14)
 
 
