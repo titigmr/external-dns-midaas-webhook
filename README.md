@@ -24,7 +24,7 @@ policy: sync
 # If `noop` midaas manage all records on zone
 registry: noop
 # can restrict zone
-domainFilters: ["subzone.dev.example.com"]
+domainFilters: ["subzone.d1.dev.example.com"]
 provider: 
   name: webhook
   webhook: 
@@ -35,6 +35,8 @@ provider:
     value: "dev.example.com"
   - name: PROVIDER_WS_URL
     value: https://midaas.com/midaas/ws"
+  - name: TSIG_ZONE_<TSIG_Keyname>
+    value: <TSIG_Keyvalue>
 ```
 
 2. Create helm deployment:
@@ -45,17 +47,19 @@ helm install external-dns external-dns -f external-dns-midaas-values.yaml
 
 ## Parameters references
 
-| Name                     | Description                                           | Default value                      |
-| ------------------------ | ----------------------------------------------------- | ---------------------------------- |
-| API_SERVER_PORT          | define the host where api listen, for all interfaces  | `"0.0.0.0"`                        |
-| API_SERVER_HOST          | define the port where api listen                      | `"8888"`                           |
-| API_READ_TIMEOUT         | timout until read                                     | `3s`                               |
-| API_WRITE_TIMEOUT        | timeout until write                                   | `3s`                               |
-| API_LOG_LEVEL            | log level among `DEBUG`,`INFO`,`TRACE`,`WARN`,`ERROR` | `INFO`                             |
-| PROVIDER_SKIP_TLS_VERIFY | enable tls verification                               | `false`                            |
-| PROVIDER_DNS_ZONE_SUFFIX | dns zone suffix                                       | `"dev.example.com"`                |
-| PROVIDER_WS_URL          | webservice url                                        | `"https://webservice.example.com"` |
+| Name                     | Description                                               | Default value                      |
+| ------------------------ | --------------------------------------------------------- | ---------------------------------- |
+| API_SERVER_PORT          | define the host where api listen, for all interfaces      | `"0.0.0.0"`                        |
+| API_SERVER_HOST          | define the port where api listen                          | `"8888"`                           |
+| API_READ_TIMEOUT         | timout until read                                         | `3s`                               |
+| API_WRITE_TIMEOUT        | timeout until write                                       | `3s`                               |
+| API_LOG_LEVEL            | log level among `DEBUG`,`INFO`,`TRACE`,`WARN`,`ERROR`     | `INFO`                             |
+| PROVIDER_SKIP_TLS_VERIFY | enable tls verification                                   | `false`                            |
+| PROVIDER_DNS_ZONE_SUFFIX | dns zone suffix                                           | `"dev.example.com"`                |
+| PROVIDER_WS_URL          | webservice url                                            | `"https://midaas.example.com/ws/"` |
+| TSIG_ZONE_<TSIG_Keyname> | tsigs credentials for manipulating one or multiples zones |                                    |
 
+For example, `TSIG_ZONE_d1` with `PROVIDER_DNS_ZONE_SUFFIX` with `dev.example.com` refer to the folowing zone: `d1.dev.example.com`
 
 
 ## Local development
