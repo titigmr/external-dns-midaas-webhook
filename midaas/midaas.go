@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -124,23 +125,24 @@ func (p *midaasProvider) ApplyRecord(action string, recordInfo *ZoneRecord) erro
 	url := fmt.Sprintf("%v/%v/%v/%v", p.wsUrl, recordInfo.DNSName, recordInfo.Type, recordInfo.Target)
 	b := Body{Keyname: recordInfo.TSIG.Keyname, Keyvalue: recordInfo.TSIG.Keyvalue}
 
+	var method string
 	switch action {
 	case dnsUpdate, dnsCreate:
 		b.UpdateTTL(recordInfo.TTL)
-		err := RequestUrl("PUT", url, b)
-		if err != nil {
-			return fmt.Errorf("%v failed: %v", action, err)
-		}
+		method = "PUT"
 	case dnsDelete:
-		err := RequestUrl("DELETE", url, b)
-		if err != nil {
-			return fmt.Errorf("%v failed: %v", action, err)
-		}
+		method = "DELETE"
 	}
 	log.WithFields(log.Fields{"DNSName": recordInfo.DNSName,
 		"Targets":    recordInfo.Target,
 		"TTL":        recordInfo.TTL,
 		"RecordType": recordInfo.Type}).Infof("Apply %v record", action)
+
+	err := RequestUrl(method, url, b)
+	if err != nil {
+		return fmt.Errorf("%v failed: %v", action, err)
+	}
+
 	return nil
 }
 
@@ -179,12 +181,25 @@ func newChange(action string, e *endpoint.Endpoint, tsig TSIGCredentials) *Chang
 		ZoneRecord: ZoneRecord{
 			DNSName: e.DNSName,
 			Type:    e.RecordType,
-			Target:  e.Targets[0],
+			Target:  formatResponse(e.Targets[0], 1),
 			TTL:     ttl,
 			TSIG:    tsig,
 		},
 	}
 	return change
+}
+
+func formatResponse(s string, order int) string {
+	s, err := url.QueryUnescape(s)
+	if err != nil {
+		log.Fatal(err)
+		return ""
+	}
+	if order == 1 {
+		return strings.ReplaceAll(s, "/", "!")
+	} else {
+		return strings.ReplaceAll(s, "!", "/")
+	}
 }
 
 func (p *midaasProvider) newChanges(action string, endpoints []*endpoint.Endpoint) []*ChangeRecord {
@@ -214,10 +229,10 @@ func RequestUrl(method string, url string, body Body) error {
 	bodyResponse, err := io.ReadAll(response.Body)
 	defer response.Body.Close()
 
-	if response.StatusCode > 200 {
 		if err != nil {
 			return err
 		}
+	if response.StatusCode > 200 {
 		return fmt.Errorf(string(bodyResponse))
 	}
 
@@ -281,7 +296,7 @@ func (p *midaasProvider) Records(ctx context.Context) ([]*endpoint.Endpoint, err
 
 			// Create Endpoint object
 			e := endpoint.Endpoint{DNSName: strings.Split(index, "./")[0],
-				Targets:    endpoint.Targets([]string{fmt.Sprint(v["value"])}),
+				Targets:    endpoint.Targets([]string{formatResponse(fmt.Sprint(v["value"]), 0)}),
 				RecordTTL:  endpoint.TTL(intTTL),
 				RecordType: fmt.Sprint(v["type"])}
 

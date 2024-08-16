@@ -22,7 +22,7 @@ policy: sync
 # -- Specify the registry for storing ownership and labels.
 # Valid values are `txt`, `aws-sd`, `dynamodb` & `noop`.
 # If `noop` midaas manage all records on zone
-registry: noop
+registry: txt
 # can restrict zone
 domainFilters: ["subzone.d1.dev.example.com"]
 provider: 
