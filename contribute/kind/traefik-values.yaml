@@ -1,9 +1,7 @@
 ---
 providers:
   kubernetesCRD:
-    namespaces:
-      - default
-      - ingress-traefik
+    enabled: false
   kubernetesIngress:
     namespaces:
       - default
@@ -11,9 +9,9 @@ providers:
 
 ports:
   web:
-    nodePort: 80
+    hostPort: 80
   websecure:
-    nodePort: 443
+    hostPort: 443
 
 service:
-  type: NodePort
+  type: ClusterIP
