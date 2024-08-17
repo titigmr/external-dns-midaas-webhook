@@ -229,9 +229,9 @@ func RequestUrl(method string, url string, body Body) error {
 	bodyResponse, err := io.ReadAll(response.Body)
 	defer response.Body.Close()
 
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return err
+	}
 	if response.StatusCode > 200 {
 		return fmt.Errorf(string(bodyResponse))
 	}
