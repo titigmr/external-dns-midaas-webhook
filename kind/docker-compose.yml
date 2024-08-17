@@ -1,7 +1,0 @@
-services:
-  server:
-    image: external-dns-midaas-webhook:dev
-    build:
-      context: ..
-      dockerfile: ./Dockerfile
-      target: dev

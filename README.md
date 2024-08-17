@@ -17,6 +17,8 @@ helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 1. Create the helm values file `external-dns-midaas-values.yaml`:
 
 ```yaml
+sources:
+  - ingress
 # -- How DNS records are synchronized between sources and providers; available values are `sync` & `upsert-only`.
 policy: sync
 # -- Specify the registry for storing ownership and labels.
@@ -24,7 +26,7 @@ policy: sync
 # If `noop` midaas manage all records on zone
 registry: txt
 # can restrict zone
-domainFilters: ["subzone.d1.dev.example.com"]
+domainFilters: []
 provider: 
   name: webhook
   webhook: 
@@ -43,7 +45,7 @@ provider:
 2. Create helm deployment:
 
 ```sh
-helm install external-dns external-dns -f external-dns-midaas-values.yaml
+helm install external-dns external-dns/external-dns -f external-dns-midaas-values.yaml
 ```
 
 ## Parameters references
@@ -65,7 +67,62 @@ For example, `TSIG_ZONE_d1` with `PROVIDER_DNS_ZONE_SUFFIX` with `dev.example.co
 
 ## Local development
 
-🚧 Work in progress.
+### Prerequisite
+
+Download and install on your local machine:
+- `make` in Debian/Ubuntu distrib with 
+```bash
+  sudo apt install build-essential
+```
+- [docker](https://docs.docker.com/engine/install/)
+- [kubectl](https://github.com/kubernetes/kubectl)
+- [kind](https://github.com/kubernetes-sigs/kind)
+- [helm](https://github.com/helm/helm)
+
+### Usage
+
+
+You can create a development stack locally with this command:
+
+```sh
+make
+```
+
+This target do the following target successively:
+- `create-cluster` : create a `kind` cluster locally with an ingress controller configured
+- `deploy-MIDAAS` : build, push and deploy `midaas` [webservice mock](./contribute/midaas-ws/) in the cluster 
+- `deploy-WEBHOOK` : build, push and deploy `external-dns` with the midaas webhook in development mode. You can modify the code with hot reload.
+
+For example, for restarting the webhook: 
+
+```bash
+make deploy-WEBHOOK
+```
+
+Don't forget create an ingress for trigger `external-dns`, an [example](./contribute/ressources/ingress.yaml) can be created with: 
+
+```bash
+make create-test-ingress 
+```
+
+You can read the containers logs with:
+
+```bash 
+make logs-webhook
+```
+
+or 
+
+```bash 
+make logs-external-dns
+```
+
+To clean all the components
+
+```sh
+make clean
+```
+
 
 ## Contributions
 

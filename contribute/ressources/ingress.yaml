@@ -5,13 +5,13 @@ metadata:
   name: test
 spec:
   rules:
-  - host: test.foo.dev.example.com
+  - host: test.d1.dev.local
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: test
+            name: midaas
             port:
               number: 8080
