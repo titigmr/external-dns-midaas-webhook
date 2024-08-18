@@ -294,11 +294,17 @@ func (p *midaasProvider) Records(ctx context.Context) ([]*endpoint.Endpoint, err
 				return nil, err
 			}
 
+			// Remove final dot in CNAME records
+			typeValue := fmt.Sprint(v["type"])
+			targetValue := fmt.Sprint(v["value"])
+			if typeValue == "CNAME" {
+				targetValue = strings.TrimSuffix(targetValue, ".")
+			}
 			// Create Endpoint object
 			e := endpoint.Endpoint{DNSName: strings.Split(index, "./")[0],
-				Targets:    endpoint.Targets([]string{formatResponse(fmt.Sprint(v["value"]), 0)}),
+				Targets:    endpoint.Targets([]string{formatResponse(targetValue, 0)}),
 				RecordTTL:  endpoint.TTL(intTTL),
-				RecordType: fmt.Sprint(v["type"])}
+				RecordType: typeValue}
 
 			log.WithFields(log.Fields{"DNSName": e.DNSName,
 				"Targets":    e.Targets,

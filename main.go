@@ -20,8 +20,8 @@ type Config struct {
 		Host string `envconfig:"API_SERVER_HOST" default:"0.0.0.0"`
 	}
 	Options struct {
-		ReadTimeout  time.Duration `envconfig:"API_READ_TIMEOUT"   default:"3s"`
-		WriteTimeout time.Duration `envconfig:"API_WRITE_TIMEOUT"  default:"3s"`
+		ReadTimeout  time.Duration `envconfig:"API_READ_TIMEOUT"   default:"10s"`
+		WriteTimeout time.Duration `envconfig:"API_WRITE_TIMEOUT"  default:"10s"`
 		LogLevel     string        `envconfig:"API_LOG_LEVEL"      default:"INFO"`
 	}
 	Provider struct {
