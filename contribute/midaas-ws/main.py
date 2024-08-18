@@ -94,7 +94,7 @@ def create(response: Response, request: Request, domaine: str, type: str, valeur
                     valeur += "."
                 key = f"{domaine}./{type}/{valeur}"
                 updated_data = data | {key: {"type": type,
-                                             "valeur": valeur,
+                                             "value": valeur,
                                              "ttl": TTL.ttl}}
                 json.dump(updated_data, f)
                 logger.info(f"Zone content : {updated_data}")
