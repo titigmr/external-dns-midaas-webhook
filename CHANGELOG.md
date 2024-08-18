@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.5](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.1.4...v0.1.5) (2024-08-18)
+
+
+### Bug Fixes
+
+* :fire: fix timeout and parsing dot ([9f1a1f0](https://github.com/titigmr/external-dns-midaas-webhook/commit/9f1a1f0b3855185ffa2747d87c5c5960d2d1a4b5))
+
 ## [0.1.4](https://github.com/titigmr/external-dns-midaas-webhook/compare/v0.1.3...v0.1.4) (2024-08-16)
 
 
