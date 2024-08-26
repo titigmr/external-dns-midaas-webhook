@@ -18,7 +18,7 @@ helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
 
 ```yaml
 sources:
-  - ingress
+- ingress
 # -- How DNS records are synchronized between sources and providers; available values are `sync` & `upsert-only`.
 policy: sync
 # -- Specify the registry for storing ownership and labels.
@@ -33,13 +33,13 @@ provider:
     image: 
       repository: ghcr.io/titigmr/external-dns-midaas-webhook
       tag: latest
-  env:
-  - name: PROVIDER_DNS_ZONE_SUFFIX
-    value: "dev.example.com"
-  - name: PROVIDER_WS_URL
-    value: https://midaas.example.com/midaas/ws"
-  - name: TSIG_ZONE_<TSIG_Keyname>
-    value: <TSIG_Keyvalue>
+    env:
+    - name: PROVIDER_DNS_ZONE_SUFFIX
+      value: "dev.example.com"
+    - name: PROVIDER_WS_URL
+      value: https://midaas.example.com/midaas/ws
+    - name: TSIG_ZONE_<TSIG_Keyname>
+      value: <TSIG_Keyvalue>
 ```
 
 2. Create helm deployment:
